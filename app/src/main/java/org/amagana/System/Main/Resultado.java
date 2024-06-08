@@ -1,10 +1,16 @@
 package org.amagana.System.Main;
 
 import android.os.Bundle;
-
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 public class Resultado extends AppCompatActivity {
 
@@ -14,6 +20,12 @@ public class Resultado extends AppCompatActivity {
     TextView proyectoTextView;
 
     ImageView imageView;
+
+    // Agrega una referencia a Firestore
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    // Agrega una referencia a Firebase Storage
+    FirebaseStorage storage = FirebaseStorage.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,20 +42,48 @@ public class Resultado extends AppCompatActivity {
         // Obtener el valor enviado desde MainActivity
         String scanResult = getIntent().getStringExtra("SCAN");
 
-        if (scanResult.equals("1")) {
-            carreraTextView.setText("Informatica");
-            gradoTextView.setText("5to Perito");
-            alumnoTextView.setText("Angel Magaña");
-            proyectoTextView.setText("AppExpoKinal");
-            imageView.setImageResource(R.drawable.kinal);
-        } else if (scanResult.equals("2")) {
-            carreraTextView.setText("Mecanica");
-            gradoTextView.setText("4to Perito");
-            alumnoTextView.setText("Alumno x");
-            proyectoTextView.setText("Expo");
-            imageView.setImageResource(R.drawable.kinal1);
-        } else {
-            // Aquí puedes manejar otros casos según sea necesario
-        }
+        // Llama al método para obtener los datos de Firestore
+        getProjectData(scanResult);
+    }
+
+    private void getProjectData(String projectId) {
+        db.collection("proyectos").document(projectId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+
+                    if (documentSnapshot.exists()) {
+                        // Aquí puedes manejar los datos obtenidos de Firestore
+                        carreraTextView.setText(documentSnapshot.getString("carrera"));
+                        gradoTextView.setText(documentSnapshot.getString("grado"));
+                        alumnoTextView.setText(documentSnapshot.getString("alumno"));
+                        proyectoTextView.setText(documentSnapshot.getString("proyecto"));
+
+                        switch(Integer.parseInt(projectId)){
+                            case 1:
+                                loadImage("compu.jpg");
+                                break;
+                            case 2:
+                                loadImage("carro.jpg");
+                                break;
+                        }
+
+                    } else {
+                        Toast.makeText(this, "No era 1: ", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error al obtener los datos: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void loadImage(String imageName) {
+        StorageReference storageRef = storage.getReference();
+        StorageReference imageRef = storageRef.child(imageName);
+
+        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            Picasso.get().load(uri).into(imageView);
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Error al cargar la imagen: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        });
     }
 }

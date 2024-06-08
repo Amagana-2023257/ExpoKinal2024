@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1068833828935",
+    "project_id": "expotur-cff50",
+    "storage_bucket": "expotur-cff50.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1068833828935:android:0d0449a805a15ad7560162",
+        "android_client_info": {
+          "package_name": "org.amagana.System.Main"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpyvSEdV61-u-h-X5Owd6Adm0mO2K0XH0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
